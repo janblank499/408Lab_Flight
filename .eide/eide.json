@@ -1,0 +1,473 @@
+{
+  "name": "CarryPilot",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": [
+      {
+        "name": "芯片官方库Library",
+        "files": [
+          {
+            "path": "Libraries/driverlib/adc.c"
+          },
+          {
+            "path": "Libraries/driverlib/aes.c"
+          },
+          {
+            "path": "Libraries/driverlib/can.c"
+          },
+          {
+            "path": "Libraries/driverlib/comp.c"
+          },
+          {
+            "path": "Libraries/driverlib/cpu.c"
+          },
+          {
+            "path": "Libraries/driverlib/crc.c"
+          },
+          {
+            "path": "Libraries/driverlib/des.c"
+          },
+          {
+            "path": "Libraries/driverlib/eeprom.c"
+          },
+          {
+            "path": "Libraries/driverlib/emac.c"
+          },
+          {
+            "path": "Libraries/driverlib/epi.c"
+          },
+          {
+            "path": "Libraries/driverlib/flash.c"
+          },
+          {
+            "path": "Libraries/driverlib/fpu.c"
+          },
+          {
+            "path": "Libraries/driverlib/gpio.c"
+          },
+          {
+            "path": "Libraries/driverlib/hibernate.c"
+          },
+          {
+            "path": "Libraries/driverlib/i2c.c"
+          },
+          {
+            "path": "Libraries/driverlib/interrupt.c"
+          },
+          {
+            "path": "Libraries/driverlib/lcd.c"
+          },
+          {
+            "path": "Libraries/driverlib/mpu.c"
+          },
+          {
+            "path": "Libraries/driverlib/pwm.c"
+          },
+          {
+            "path": "Libraries/driverlib/qei.c"
+          },
+          {
+            "path": "Libraries/driverlib/shamd5.c"
+          },
+          {
+            "path": "Libraries/driverlib/ssi.c"
+          },
+          {
+            "path": "Libraries/driverlib/sw_crc.c"
+          },
+          {
+            "path": "Libraries/driverlib/sysctl.c"
+          },
+          {
+            "path": "Libraries/driverlib/sysexc.c"
+          },
+          {
+            "path": "Libraries/driverlib/systick.c"
+          },
+          {
+            "path": "Libraries/driverlib/timer.c"
+          },
+          {
+            "path": "Libraries/driverlib/uart.c"
+          },
+          {
+            "path": "Libraries/driverlib/udma.c"
+          },
+          {
+            "path": "Libraries/driverlib/usb.c"
+          },
+          {
+            "path": "Libraries/driverlib/watchdog.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "主函数User",
+        "files": [
+          {
+            "path": "User/Headfile.h"
+          },
+          {
+            "path": "User/main.c"
+          },
+          {
+            "path": "User/startup_rvmdk.S"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "硬件资源驱动CP_Src",
+        "files": [
+          {
+            "path": "Libraries/utils/uartstdio.c"
+          },
+          {
+            "path": "WP_Src/Calibration.c"
+          },
+          {
+            "path": "WP_Src/CalibrationRoutines.c"
+          },
+          {
+            "path": "WP_Src/Bling.c"
+          },
+          {
+            "path": "WP_Src/Filter.c"
+          },
+          {
+            "path": "WP_Src/GPS.c"
+          },
+          {
+            "path": "WP_Src/IST8310.c"
+          },
+          {
+            "path": "WP_Src/Key.c"
+          },
+          {
+            "path": "WP_Src/ICM2068X.c"
+          },
+          {
+            "path": "WP_Src/myiic.c"
+          },
+          {
+            "path": "WP_Src/OLED.c"
+          },
+          {
+            "path": "WP_Src/OpticalFlow_LC306.c"
+          },
+          {
+            "path": "WP_Src/PPM.c"
+          },
+          {
+            "path": "WP_Src/RC.c"
+          },
+          {
+            "path": "WP_Src/Ringbuf.c"
+          },
+          {
+            "path": "WP_Src/Schedule.c"
+          },
+          {
+            "path": "WP_Src/SPL06.c"
+          },
+          {
+            "path": "WP_Src/Time.c"
+          },
+          {
+            "path": "WP_Src/Time_Cnt.c"
+          },
+          {
+            "path": "WP_Src/US_100.c"
+          },
+          {
+            "path": "WP_Src/SYSTEM.c"
+          },
+          {
+            "path": "WP_Src/Usart.c"
+          },
+          {
+            "path": "WP_Src/WP_ADC.c"
+          },
+          {
+            "path": "WP_Src/wp_flash.c"
+          },
+          {
+            "path": "WP_Src/WP_Math.c"
+          },
+          {
+            "path": "WP_Src/WP_PWM.c"
+          },
+          {
+            "path": "WP_Src/ssd1306.c"
+          },
+          {
+            "path": "WP_Src/Soft_I2C.c"
+          },
+          {
+            "path": "WP_Src/QMC5883.c"
+          },
+          {
+            "path": "WP_Src/tfmini.c"
+          },
+          {
+            "path": "WP_Src/tfmini.h"
+          },
+          {
+            "path": "WP_Src/NCLink.c"
+          },
+          {
+            "path": "WP_Src/TOFSensor.c"
+          },
+          {
+            "path": "WP_Src/Quaternion.c"
+          },
+          {
+            "path": "WP_Src/Compass.c"
+          },
+          {
+            "path": "WP_Src/Double.c"
+          },
+          {
+            "path": "WP_Src/Reserved_IO.c"
+          },
+          {
+            "path": "WP_Src/Reserved_Serialport.c"
+          },
+          {
+            "path": "WP_Src/LSN10.c"
+          },
+          {
+            "path": "WP_Src/speaker.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "状态估计与基础飞行控制CP_Ctrl",
+        "files": [
+          {
+            "path": "WP_Ctrl/Earth_Declination.c"
+          },
+          {
+            "path": "WP_Ctrl/Sensor.c"
+          },
+          {
+            "path": "WP_Ctrl/SINS.c"
+          },
+          {
+            "path": "WP_Ctrl/control_land.c"
+          },
+          {
+            "path": "WP_Ctrl/PID.c"
+          },
+          {
+            "path": "WP_Ctrl/control_althold.c"
+          },
+          {
+            "path": "WP_Ctrl/control_poshold.c"
+          },
+          {
+            "path": "WP_Ctrl/OpticalFlow_Control.c"
+          },
+          {
+            "path": "WP_Ctrl/WP_Ctrl.c"
+          },
+          {
+            "path": "WP_Ctrl/License.c"
+          },
+          {
+            "path": "WP_Ctrl/NamelessCotrun_OpticalFlow.c"
+          },
+          {
+            "path": "WP_Ctrl/NamelessCotrun_SDK.c"
+          },
+          {
+            "path": "WP_Ctrl/Temperature_Ctrl.c"
+          },
+          {
+            "path": "WP_Ctrl/ADC_Button.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "用户应用开发控制API_Ctrl",
+        "files": [
+          {
+            "path": "WP_Ctrl/Developer_Mode.c"
+          },
+          {
+            "path": "WP_Ctrl/Subtask_Demo.c"
+          }
+        ],
+        "folders": []
+      }
+    ]
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "10bf6b734798c878acd04178ef2fa036"
+  },
+  "targets": {
+    "CarryPilot_LaunchPad_V6.0.2": {
+      "excludeList": [],
+      "toolchain": "AC5",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "Output/CarryPilot.sct",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20000000",
+                "size": "0x8000"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x40000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "null",
+          "cpuName": "null"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "Libraries/inc",
+          "Libraries/utils",
+          "WP_Ctrl",
+          "WP_Src",
+          "User",
+          "Libraries/driverlib",
+          "WP_Src/VL53L1X/core",
+          "WP_Src/VL53L1X",
+          ".cmsis/include",
+          "RTE/_CarryPilot_LaunchPad_V6.0.2"
+        ],
+        "libList": [],
+        "defineList": [
+          "rvmdk",
+          "PART_TM4C123GH6PM",
+          "TARGET_IS_BLIZZARD_RB1",
+          "__USE_ANSI_EXAMPLE_RAND"
+        ]
+      }
+    }
+  },
+  "version": "3.4"
+}
