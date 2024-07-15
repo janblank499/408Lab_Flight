@@ -2967,7 +2967,7 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
 		
 		//任务结束约束条件1
-		//色块对准执行100000ms后，默认已完成对准
+		//色块对准执行100000ms（100s）后，默认已完成对准
 		if(execute_time_ms[n]>0) execute_time_ms[n]--;
 		if(execute_time_ms[n]==0)//悬停时间计数器归零，悬停任务执行完毕 
 		{
