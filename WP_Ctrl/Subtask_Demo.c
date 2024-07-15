@@ -2670,7 +2670,7 @@ void Air_Ground_Extinguish_Fire_System_Basic(void)
 			flight_subtask_cnt[n]=2;
 			flight_global_cnt[n]=0;
 			execute_time_ms[n]=0;				
-		}		
+		}//这一部分只设置了航点，下一个子任务飞向设置的航点
 	}
 	else if(flight_subtask_cnt[n]==2)//检测起飞点悬停完毕后，飞向下一个目标点
 	{
