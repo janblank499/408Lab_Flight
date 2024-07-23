@@ -178,7 +178,7 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 				SDK_DT_Send_Check(openmv_work_mode,UART3_SDK);//起飞完毕之后，将底部OPENMV设置成色块、形状检测模式
 			}
 			//2022年月电子设计竞赛B题送货无人机——第2部分
-			Deliver_UAV_Innov0ation();
+			Deliver_UAV_Innovation();
 		}
 		break;		
 		case 17://2022年电赛送货无人机赛题——创新
