@@ -31,7 +31,7 @@
 #define  SDK_Stable_Acceleration_Max   500
 
 
-#define  Flight_Max_Height     5000//最大飞行高度5000M
+#define  Flight_Max_Height     5000//最大飞行高度5000M，默认5000
 #define  Flight_Max_Radius     5000//最大飞行半径5000M
 
 #define  Thr_Start  1050//起转油门量，油门倾角补偿用，太大会导致过补偿

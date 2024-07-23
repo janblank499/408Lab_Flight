@@ -129,10 +129,11 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 		{
 			if(Auto_Takeoff(Target_Height)==1)//WORK_HEIGHT_CM
 			{
-				*mode+=1;  //到达目标高度后，切换到下一SDK任务
+				//*mode+=1;  //到达目标高度后，切换到下一SDK任务
 				//*mode+=4;//到达目标高度后，切换2022年7月省赛第一部分任务
 				//*mode+=5;//到达目标高度后，切换2022年7月省赛第二部分任务
 				//*mode+=6;//到达目标高度后，切换2022年7月省赛第三部分任务
+				*mode+=task_select_cnt;
 			}
 		}
 		break;
@@ -158,7 +159,7 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 			basic_auto_flight_support();
 		}
 		break;
-		case 15://2021年电赛送货无人机赛题——基础
+		case 15://2022年电赛送货无人机赛题——基础
 		{
 			if(openmv_work_mode==0)//只配置一次
 			{
@@ -169,7 +170,7 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 			Deliver_UAV_Basic();
 		}
 		break;
-		case 16://2021年电赛送货无人机赛题——发挥
+		case 16://2022年电赛送货无人机赛题——发挥
 		{
 			if(openmv_work_mode==0)//只配置一次
 			{
@@ -177,10 +178,10 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 				SDK_DT_Send_Check(openmv_work_mode,UART3_SDK);//起飞完毕之后，将底部OPENMV设置成色块、形状检测模式
 			}
 			//2022年月电子设计竞赛B题送货无人机——第2部分
-			Deliver_UAV_Innovation();
+			Deliver_UAV_Innov0ation();
 		}
 		break;		
-		case 17://2021年电赛送货无人机赛题——创新
+		case 17://2022年电赛送货无人机赛题——创新
 		{
 			//2022年月电子设计竞赛B题送货无人机——第3部分
 			Deliver_UAV_Hulahoop();

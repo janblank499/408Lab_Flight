@@ -433,7 +433,7 @@ void QuadShow(uint8_t show_enable)
 					{
 						while(Pitch_Control<=-Scale_Pecent_Max*Pit_Rol_Max);
 						task_select_cnt++;
-						if(task_select_cnt>2)	task_select_cnt=1;
+						if(task_select_cnt>6)	task_select_cnt=1;
 						WriteFlashParameter(TASK_SELECT_AFTER_TAKEOFF,task_select_cnt);//任务选择计数器
 						Bling_Set(&rgb_blue,500,50,0.2,0,GPIO_PORTF_BASE,GPIO_PIN_2,0);//蓝色
 					}
@@ -443,7 +443,7 @@ void QuadShow(uint8_t show_enable)
 				{
 						_button.state[UP].press=NO_PRESS;
 						task_select_cnt++;
-						if(task_select_cnt>2)	task_select_cnt=1;
+						if(task_select_cnt>6)	task_select_cnt=1;
 						WriteFlashParameter(TASK_SELECT_AFTER_TAKEOFF,task_select_cnt);//任务选择计数器
 						Bling_Set(&rgb_blue,500,50,0.2,0,GPIO_PORTF_BASE,GPIO_PIN_2,0);//蓝色		
 				}		
