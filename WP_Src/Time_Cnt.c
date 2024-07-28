@@ -52,7 +52,7 @@ void Time0A_init(void)//系统调度定时器初始化
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);							//定时器0使能				
   TimerConfigure(TIMER0_BASE,TIMER_CFG_PERIODIC);						//32位周期定时器				
   TimerLoadSet(TIMER0_BASE,TIMER_A,SysCtlClockGet()/200);		//设定装载值,（80M/200）*1/80M=5ms				
-  IntEnable(INT_TIMER0A);																		//总中断使能				
+  IntEnable(INT_TIMER0A);												//总中断使能				
   TimerIntEnable(TIMER0_BASE,TIMER_TIMA_TIMEOUT); 					//中断输出, 设置模式;			
   TimerIntRegister(TIMER0_BASE,TIMER_A,TIMER0A_Handler);		//中断函数注册
 //  IntMasterEnable();			
@@ -78,7 +78,7 @@ void Time1A_init(void)
 
 void Time2A_init(void)//系统调度定时器初始化
 {
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);							//定时器0使能				
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);							//定时器2使能				
   TimerConfigure(TIMER2_BASE,TIMER_CFG_PERIODIC);						//32位周期定时器				
   TimerLoadSet(TIMER2_BASE,TIMER_A,SysCtlClockGet()/100);		//设定装载值,（80M/100）*1/80M=10ms				
   IntEnable(INT_TIMER2A);																		//总中断使能				
@@ -91,7 +91,7 @@ void Time2A_init(void)//系统调度定时器初始化
 
 void Time3A_init(void)//系统调度定时器初始化
 {
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);							//定时器0使能				
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER3);							//定时器3使能				
   TimerConfigure(TIMER3_BASE,TIMER_CFG_PERIODIC);						//32位周期定时器				
   TimerLoadSet(TIMER3_BASE,TIMER_A,SysCtlClockGet()/1000);		//设定装载值,（80M/1000）*1/80M=1.0ms				
   IntEnable(INT_TIMER3A);																		//总中断使能				

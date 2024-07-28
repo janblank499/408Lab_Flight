@@ -3103,3 +3103,10 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 	}
 }
 
+#define navpoint_num_basic   6
+const int16_t //题目使用的航点。
+
+void test(void)
+{
+	static uint8_t n=16;//子线程计数器序号
+}

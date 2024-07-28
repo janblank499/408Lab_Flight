@@ -197,10 +197,10 @@ void NCLink_Send_Status(float roll,float pitch,float yaw,
   nclink_databuf[_cnt++]=NCLINK_STATUS;
   nclink_databuf[_cnt++]=0;
   
-  _temp = (int)(roll*100);
+  _temp = (int)(roll*100);//ºá¹ö½Ç
   nclink_databuf[_cnt++]=BYTE1(_temp);
   nclink_databuf[_cnt++]=BYTE0(_temp);
-  _temp = (int)(pitch*100);
+  _temp = (int)(pitch*100);//¸©Ñö½Ç
   nclink_databuf[_cnt++]=BYTE1(_temp);
   nclink_databuf[_cnt++]=BYTE0(_temp);
   _temp = (int)(yaw*10);

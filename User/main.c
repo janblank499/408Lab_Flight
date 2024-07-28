@@ -61,9 +61,9 @@ int main(void)
   HardWave_Init();//芯片资源、飞控外设初始化
   while(1)//主循环：约20ms
   {	
-		Get_Battery_Voltage();						//测量电池电压		
-		Key_Scan(Key_Right_Release);			//按键扫描
-		QuadShow(1);			  							//OLED显示，飞控两个按键同时按下，停止/恢复自动刷新
+		Get_Battery_Voltage();				//测量电池电压		
+		Key_Scan(Key_Right_Release);		//按键扫描
+		QuadShow(1);			  			//OLED显示，飞控两个按键同时按下，停止/恢复自动刷新
 		Accel_Calibartion();              //加速度计6面校准
 		Mag_Calibartion_LS(&WP_Sensor.mag_raw,Circle_Angle);//磁力计椭球校准
 		RC_Calibration_Check(Receiver_PPM_Databuf);//遥控器行程校准
