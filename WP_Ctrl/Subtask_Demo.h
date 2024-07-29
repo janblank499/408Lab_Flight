@@ -34,6 +34,7 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void);
 void Navigation_User_Setpoint(void);
 
 void substask_params_init(void);
+void warehouse_master(void);
 
 extern uint16_t flight_subtask_cnt[FLIGHT_SUBTASK_NUM];
 extern uint32_t execute_time_ms[FLIGHT_SUBTASK_NUM];

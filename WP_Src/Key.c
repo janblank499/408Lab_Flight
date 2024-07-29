@@ -1717,6 +1717,83 @@ void QuadShow(uint8_t show_enable)
 		break;
 		case 28:
 		{
+			uint16_t base_item=50+21*4;
+			LCD_clear_L(0,0);		display_6_8_string(0,0,"nav_point:29/35 e-n-u");write_6_8_number(115,0,Page_Number+1);
+			LCD_clear_L(0,1);		display_6_8_string(0,1,"p29");   		           write_6_8_number(25,1,param_value[base_item+0]);  write_6_8_number(60,1,param_value[base_item+1]);  write_6_8_number(95,1,param_value[base_item+2]);
+			LCD_clear_L(0,2);		display_6_8_string(0,2,"p30");  			         write_6_8_number(25,2,param_value[base_item+3]);  write_6_8_number(60,2,param_value[base_item+4]);  write_6_8_number(95,2,param_value[base_item+5]);
+			LCD_clear_L(0,3);		display_6_8_string(0,3,"p31");  			         write_6_8_number(25,3,param_value[base_item+6]);  write_6_8_number(60,3,param_value[base_item+7]);  write_6_8_number(95,3,param_value[base_item+8]);
+			LCD_clear_L(0,4);		display_6_8_string(0,4,"p32");				         write_6_8_number(25,4,param_value[base_item+9]);  write_6_8_number(60,4,param_value[base_item+10]); write_6_8_number(95,4,param_value[base_item+11]);
+			LCD_clear_L(0,5);		display_6_8_string(0,5,"p33");			           write_6_8_number(25,5,param_value[base_item+12]); write_6_8_number(60,5,param_value[base_item+13]); write_6_8_number(95,5,param_value[base_item+14]);
+      LCD_clear_L(0,6);		display_6_8_string(0,6,"p34");				         write_6_8_number(25,6,param_value[base_item+15]); write_6_8_number(60,6,param_value[base_item+16]); write_6_8_number(95,6,param_value[base_item+17]);
+      LCD_clear_L(0,7);		display_6_8_string(0,7,"p35");				         write_6_8_number(25,7,param_value[base_item+18]); write_6_8_number(60,7,param_value[base_item+19]); write_6_8_number(95,7,param_value[base_item+20]);
+			
+			static uint16_t ver_item=1;	
+			if(ver_item==1)	  display_6_8_string(18,1,"*"); else if(ver_item==2)	display_6_8_string(53,1,"*"); else if(ver_item==3)	display_6_8_string(88,1,"*");
+			if(ver_item==4)  	display_6_8_string(18,2,"*"); else if(ver_item==5)	display_6_8_string(53,2,"*"); else if(ver_item==6)	display_6_8_string(88,2,"*");
+			if(ver_item==7)	  display_6_8_string(18,3,"*"); else if(ver_item==8)	display_6_8_string(53,3,"*"); else if(ver_item==9)	display_6_8_string(88,3,"*");
+			if(ver_item==10)	display_6_8_string(18,4,"*"); else if(ver_item==11)	display_6_8_string(53,4,"*"); else if(ver_item==12)	display_6_8_string(88,4,"*");
+			if(ver_item==13)	display_6_8_string(18,5,"*"); else if(ver_item==14)	display_6_8_string(53,5,"*"); else if(ver_item==15)	display_6_8_string(88,5,"*");
+			if(ver_item==16)	display_6_8_string(18,6,"*"); else if(ver_item==17)	display_6_8_string(53,6,"*"); else if(ver_item==18)	display_6_8_string(88,6,"*");
+			if(ver_item==19)	display_6_8_string(18,7,"*"); else if(ver_item==20)	display_6_8_string(53,7,"*"); else if(ver_item==21)	display_6_8_string(88,7,"*");
+			
+			//通过3D按键来实现换行选中待修改参数
+			if(_button.state[UP_3D].press==SHORT_PRESS)
+			{
+					_button.state[UP_3D].press=NO_PRESS;
+					ver_item--;
+					if(ver_item<1) ver_item=21;
+					Bling_Set(&rgb_blue,500,50,0.2,0,GPIO_PORTF_BASE,GPIO_PIN_2,0);//蓝色				
+			}
+			if(_button.state[DN_3D].press==SHORT_PRESS)
+			{
+					_button.state[DN_3D].press=NO_PRESS;
+					ver_item++;
+					if(ver_item>21) ver_item=1;
+					Bling_Set(&rgb_blue,500,50,0.2,0,GPIO_PORTF_BASE,GPIO_PIN_2,0);//蓝色				
+			}
+			
+			//通过左按键短按可以实现选中的参数行自减小1调整
+			if(_button.state[LT_3D].press==SHORT_PRESS)
+			{
+				_button.state[LT_3D].press=NO_PRESS;
+			   param_value[base_item+ver_item-1]-=1;
+			}
+			
+			//通过右按键短按可以实现选中的参数行自增加1调整
+			if(_button.state[RT_3D].press==SHORT_PRESS)
+			{
+				_button.state[RT_3D].press=NO_PRESS;
+			   param_value[base_item+ver_item-1]+=1;
+			}			
+			
+			//通过左按键短按可以实现选中的参数行自减小50调整
+			if(_button.state[LT_3D].press==LONG_PRESS)
+			{
+				_button.state[LT_3D].press=NO_PRESS;
+			   param_value[base_item+ver_item-1]-=50;
+			}
+			
+			//通过右按键短按可以实现选中的参数行自增加50调整
+			if(_button.state[RT_3D].press==LONG_PRESS)
+			{
+				_button.state[RT_3D].press=NO_PRESS;
+			   param_value[base_item+ver_item-1]+=50;
+			}		
+
+			//通过中间按键长按可以实现此页设置的所有参数保存
+			if(_button.state[ME_3D].press==LONG_PRESS)
+			{
+				_button.state[ME_3D].press=NO_PRESS;
+				//按下后对参数进行保存
+				for(uint16_t i=0;i<21;i++)
+				{
+					WriteFlashParameter(RESERVED_PARAM+base_item+i,param_value[base_item+i]);
+				}
+			}	
+		}
+		break;
+		case 29:
+		{
 			LCD_clear_L(0,0); display_6_8_string(0,0,"tofsense_m");       write_6_8_number_f1(60,0,GD_Distance*10);  write_6_8_number(115,0,Page_Number+1);
 			LCD_clear_L(0,1);	write_6_8_number(0,1,tofsense_m[0].dis_mm); write_6_8_number(30,1,tofsense_m[1].dis_mm);  write_6_8_number(60,1,tofsense_m[2].dis_mm);  write_6_8_number(90,1,tofsense_m[3].dis_mm);   
 			LCD_clear_L(0,2); write_6_8_number(0,2,tofsense_m[4].dis_mm); write_6_8_number(30,2,tofsense_m[5].dis_mm);  write_6_8_number(60,2,tofsense_m[6].dis_mm);  write_6_8_number(90,2,tofsense_m[8].dis_mm); 
@@ -1724,7 +1801,7 @@ void QuadShow(uint8_t show_enable)
 			LCD_clear_L(0,4); write_6_8_number(0,4,tofsense_m[12].dis_mm);write_6_8_number(30,4,tofsense_m[13].dis_mm); write_6_8_number(60,4,tofsense_m[14].dis_mm); write_6_8_number(90,4,tofsense_m[15].dis_mm); 
 		}
 		break;
-		case 29:
+		case 30:
 		{
 			static uint8_t factory_reset_flag=0;
 			LCD_clear_L(0,0);		display_6_8_string(25,0,"setup");								  write_6_8_number(70,0,PPM_Databuf[2]); write_6_8_number(105,0,Page_Number+1);
@@ -1825,7 +1902,7 @@ void QuadShow(uint8_t show_enable)
 			
 		}
 		break;	
-		case 30:
+		case 31:
 		{
 			LCD_clear_L(0,0);		display_6_8_string(0,0,"imu_filter_setup");		    write_6_8_number(105,0,Page_Number+1);
 			LCD_clear_L(0,1);		display_6_8_string(0,1,"player:");   	      			write_6_8_number(105,1,WP_AHRS.player_level);
@@ -1976,7 +2053,7 @@ void QuadShow(uint8_t show_enable)
 			}			
 		}
 		break;
-		case 31://姿态控制参数调节
+		case 32://姿态控制参数调节
 		{
 			LCD_clear_L(0,0);		display_6_8_string(0,0,"pit_angle_kp:");	write_6_8_number(90,0,Total_Controller.Pitch_Angle_Control.Kp);	
 			LCD_clear_L(0,1);		display_6_8_string(0,1,"pit_gyro_kp :");  write_6_8_number(90,1,Total_Controller.Pitch_Gyro_Control.Kp);
@@ -2166,7 +2243,7 @@ void QuadShow(uint8_t show_enable)
 			}			
 		}
 		break;
-		case 32://位置控制参数调节
+		case 33://位置控制参数调节
 		{
 			LCD_clear_L(0,0);		display_6_8_string(0,0,"opt_pos_kp:");	 write_6_8_number(90,0,Total_Controller.Optical_Position_Control.Kp);	
 			LCD_clear_L(0,1);		display_6_8_string(0,1,"opt_vel_kp :");  write_6_8_number(90,1,Total_Controller.Optical_Speed_Control.Kp);

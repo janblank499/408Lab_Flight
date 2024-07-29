@@ -185,7 +185,7 @@ void TIMER1A_Handler(void)//温控中断函数
 
 
 Testime Time2_Delta;
-void TIMER2A_Handler(void)//地面站数据发送中断函数
+void TIMER2A_Handler(void)//地面站数据发送中断函数 10ms
 {
 	Test_Period(&Time2_Delta);
 	NCLink_SEND_StateMachine();			//无名创新开源地面站，下载链接http://nameless.tech/download.html

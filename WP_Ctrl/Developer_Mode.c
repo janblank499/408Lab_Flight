@@ -151,7 +151,8 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 		break;
     case 13://ROS上位机控制无人机
 		{
-			ros_flight_support();
+			//ros_flight_support();
+			warehouse_master();
 		}
 		break;
     case 14: //导航控制控制函数，可以用于无名创新地面站控制

@@ -2432,7 +2432,7 @@ uint8_t Auto_Takeoff(float target)
 
 /********************************************************************************************************************/
 #define nav_param_base (51-1)  //预留参数数组用于存放航点信息的起始量
-#define user_setpoint_max 28   //最大航点数，可根据实际项目需要自己定义:显示屏航点设置页面为4页，每页有7个航点，共28个
+#define user_setpoint_max 35   //最大航点数，可根据实际项目需要自己定义:显示屏航点设置页面为4页，每页有7个航点，共28个
 #define user_setpoint_fixed_2d_cm  5.0f //5cm
 #define user_setpoint_fixed_3d_cm  10.0f//10cm
 #define user_setpoint_fixed_times  5//满足次数
@@ -3103,10 +3103,163 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 	}
 }
 
-#define navpoint_num_basic   6
-const int16_t //题目使用的航点。
+void Tan90(void)
+{
+	static uint8_t n=0;
+	if(flight_subtask_cnt[n]==0)
+	{
+		Flight.yaw_ctrl_mode=CLOCKWISE;
+		Flight.yaw_ctrl_start=1;
+		Flight.yaw_outer_control_output  =90;//顺时针90度	
+		OpticalFlow_Control_Pure(0);	
+		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
+		flight_subtask_cnt[n]=1;		
+	}
+	else if(flight_subtask_cnt[n]==1)
+	{
+		Flight.yaw_ctrl_mode=CLOCKWISE;
+		Flight.yaw_outer_control_output  =0;
+		OpticalFlow_Control_Pure(0);	
+		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
+		
+		if(Flight.yaw_ctrl_end==1);//执行完毕后，切换到下一阶段	
+	}
+}
 
-void test(void)
+void Tan180(void)
+{
+	static uint8_t n=0;
+	if(flight_subtask_cnt[n]==0)
+	{
+		Flight.yaw_ctrl_mode=CLOCKWISE;
+		Flight.yaw_ctrl_start=1;
+		Flight.yaw_outer_control_output  =180;//顺时针90度	
+		OpticalFlow_Control_Pure(0);	
+		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
+		flight_subtask_cnt[n]=1;		
+	}
+	else if(flight_subtask_cnt[n]==1)
+	{
+		Flight.yaw_ctrl_mode=CLOCKWISE;
+		Flight.yaw_outer_control_output  =0;
+		OpticalFlow_Control_Pure(0);	
+		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
+		
+		if(Flight.yaw_ctrl_end==1);//执行完毕后，切换到下一阶段	
+	}
+}
+
+#define Scale_Param_2 25.0f
+uint16_t QRFlag=0;
+const int16_t warehouse_work_waypoints_table[3][32]={
+{0,2,2,2,2,2,2,2,4,4,4,4,4,4,4,4,10,10,10,10,10,10,10,12,12,12,12,12,12,12,12,14},//x轴坐标
+{0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
+{150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140}};//Z轴坐标
+
+void warehouse_master(void)
 {
 	static uint8_t n=16;//子线程计数器序号
+	Vector3f target_position;
+	float x=0,y=0,z=0;	
+	if(flight_subtask_cnt[n]==0)//起飞点作为第一个悬停点
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+			
+		//记录下初始起点位置，实际项目中可设置为某一基准原点，在自动起飞中指定xy原点
+		//base_position.x=VIO_SINS.Position[_EAST];
+		//base_position.y=VIO_SINS.Position[_NORTH];
+		base_position.z=First_Working_Height;//第一作业高度
+		
+		x=base_position.x;
+		y=base_position.y;
+		z=First_Working_Height;
+		target_position.x=x;
+		target_position.y=y;
+		target_position.z=z;
+		Horizontal_Navigation(target_position.x,
+													target_position.y,
+													target_position.z,
+													GLOBAL_MODE,
+													MAP_FRAME);
+		Tan90();
+		flight_subtask_cnt[n]=1;
+		flight_global_cnt[n]=0;
+		execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+
+	}
+	else if(flight_subtask_cnt[n]<33)//到达A点所在作业点后，遍历所有航点并检测是否打点,不包括起飞降落共三十个点
+	{
+		if(QRFlag==0)
+		{
+			basic_auto_flight_support();//基本飞行支持软件
+			if(execute_time_ms[n]>0) execute_time_ms[n]--;
+			if(execute_time_ms[n]==0) 
+			{
+				if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
+				{
+					float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
+					if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
+					else flight_global_cnt[n]/=2;
+				}
+				else
+				{
+					laser_light1.reset=1;
+					laser_light1.times=50000;//闪速50000次
+					laser_light1.period=200;//200*5ms
+					laser_light1.light_on_percent=1.0f;
+
+					execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
+					target_position.x=base_position.x+Scale_Param_2*warehouse_work_waypoints_table[0][flight_subtask_cnt[n]];
+					target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table[1][flight_subtask_cnt[n]];
+					target_position.z=base_position.z+warehouse_work_waypoints_table[2][flight_subtask_cnt[n]];
+					Horizontal_Navigation(target_position.x,
+																target_position.y,
+																target_position.z,
+																GLOBAL_MODE,
+																MAP_FRAME);
+					if(flight_subtask_cnt[n]==8||flight_subtask_cnt[n]==16||flight_subtask_cnt[n]==24)
+					{
+						Tan180();
+					}
+					flight_subtask_cnt[n]++;
+					flight_global_cnt[n]=0;
+					//QRFlag=1;
+					if(1)
+					{
+						laser_light1.reset=1;
+						laser_light1.times=1;//闪烁50000次
+						laser_light1.period=200;//200*5ms
+						laser_light1.light_on_percent=0.5f;
+					}
+				}
+			}
+		}
+		else if(QRFlag==1)
+		{
+			//basic_auto_flight_support();
+			//Front_AprilTag_Control_Pilot();
+			QRFlag==0;
+		}
+	}
+	else if(flight_subtask_cnt[n]==33)
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
+			{
+				float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
+				if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
+				else flight_global_cnt[n]/=2;
+			}
+			else
+			{
+				Flight.yaw_ctrl_mode=ROTATE;
+				Flight.yaw_outer_control_output=RC_Data.rc_rpyt[RC_YAW];
+				OpticalFlow_Control_Pure(0);
+				Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制	
+			}
+		}	
+	}
 }
