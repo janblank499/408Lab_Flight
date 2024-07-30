@@ -102,7 +102,10 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 		break;
     case 6:
 		{
-			flight_subtask_1();//顺时针转动90度，完成后降落
+			if(Auto_Takeoff(Target_Height)==1)
+			{
+				flight_subtask_1();//顺时针转动90度，完成后降落
+			}
 		}
 		break;
     case 7:

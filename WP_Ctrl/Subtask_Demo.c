@@ -126,7 +126,7 @@ void flight_subtask_1(void)
 		Flight.yaw_ctrl_mode=ROTATE;
 		Flight.yaw_outer_control_output  =RC_Data.rc_rpyt[RC_YAW];
 		OpticalFlow_Control_Pure(0);
-		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制
+		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-20);//高度控制
 	}
 	else
 	{
@@ -3103,11 +3103,29 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 	}
 }
 
+#define Scale_Param_2 25.0f
+uint16_t QRFlag=0;
+uint16_t TanFlag=0;
+#define Scale_Param_2 25.0f
+const int16_t warehouse_work_waypoints_table[3][35]={
+{0,1,1,1,1,1,1,1,//A面航点坐标
+5,5,5,5,5,5,5,5,//B面航点坐标
+9,9,9,9,9,9,9,//C面航点坐标
+13,13,13,13,13,13,13,13,//D面航点坐标
+14},//x轴坐标
+{0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
+{150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,0}};//Z轴坐标
+uint16_t warehouse_flag[2][24]={
+{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}//A1~D6
+{0}
+};
+
 void Tan90(void)
 {
-	static uint8_t n=0;
+	static uint8_t n=17;
 	if(flight_subtask_cnt[n]==0)
 	{
+		TanFlag=0;
 		Flight.yaw_ctrl_mode=CLOCKWISE;
 		Flight.yaw_ctrl_start=1;
 		Flight.yaw_outer_control_output  =90;//顺时针90度	
@@ -3122,15 +3140,29 @@ void Tan90(void)
 		OpticalFlow_Control_Pure(0);	
 		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
 		
-		if(Flight.yaw_ctrl_end==1);//执行完毕后，切换到下一阶段	
+		if(Flight.yaw_ctrl_end==1)  flight_subtask_cnt[n]=2;//执行完毕后，切换到下一阶段	
+	}
+	else if(flight_subtask_cnt[n]==2)
+	{
+		
+		Flight.yaw_ctrl_mode=ROTATE;
+		Flight.yaw_outer_control_output  =RC_Data.rc_rpyt[RC_YAW];
+		OpticalFlow_Control_Pure(0);//SLAM定点控制
+		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,NUL);//高度控制
+		TanFlag=1;
+	}
+	else
+	{
+		basic_auto_flight_support();//基本飞行支持软件
 	}
 }
 
 void Tan180(void)
 {
-	static uint8_t n=0;
+	static uint8_t n=18;
 	if(flight_subtask_cnt[n]==0)
 	{
+		TanFlag=0;
 		Flight.yaw_ctrl_mode=CLOCKWISE;
 		Flight.yaw_ctrl_start=1;
 		Flight.yaw_outer_control_output  =180;//顺时针90度	
@@ -3145,16 +3177,23 @@ void Tan180(void)
 		OpticalFlow_Control_Pure(0);	
 		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
 		
-		if(Flight.yaw_ctrl_end==1);//执行完毕后，切换到下一阶段	
+		if(Flight.yaw_ctrl_end==1)  flight_subtask_cnt[n]=2;//执行完毕后，切换到下一阶段	
+	}
+	else if(flight_subtask_cnt[n]==2)
+	{
+		
+		Flight.yaw_ctrl_mode=ROTATE;
+		Flight.yaw_outer_control_output  =RC_Data.rc_rpyt[RC_YAW];
+		OpticalFlow_Control_Pure(0);//SLAM定点控制
+		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,NUL);//高度控制
+		TanFlag=1;
+	}
+	else
+	{
+		basic_auto_flight_support();//基本飞行支持软件
 	}
 }
 
-#define Scale_Param_2 25.0f
-uint16_t QRFlag=0;
-const int16_t warehouse_work_waypoints_table[3][32]={
-{0,2,2,2,2,2,2,2,4,4,4,4,4,4,4,4,10,10,10,10,10,10,10,12,12,12,12,12,12,12,12,14},//x轴坐标
-{0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
-{150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140}};//Z轴坐标
 
 void warehouse_master(void)
 {
@@ -3181,13 +3220,59 @@ void warehouse_master(void)
 													target_position.z,
 													GLOBAL_MODE,
 													MAP_FRAME);
-		Tan90();
-		flight_subtask_cnt[n]=1;
+		flight_subtask_cnt[n]++;
 		flight_global_cnt[n]=0;
 		execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
 
 	}
-	else if(flight_subtask_cnt[n]<33)//到达A点所在作业点后，遍历所有航点并检测是否打点,不包括起飞降落共三十个点
+	else if(flight_subtask_cnt[n]==1)//在起飞点旋转90度
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			Tan90();
+			if(TanFlag==1)
+			{
+				flight_subtask_cnt[n]++;
+				flight_global_cnt[n]=0;
+				execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+			}
+		}
+	}
+	else if(flight_subtask_cnt[n]==2)//指定航点到起飞点140高度
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0)
+		{
+			target_position.z=140;
+			Horizontal_Navigation(target_position.x,
+									target_position.y,
+									target_position.z,
+									GLOBAL_MODE,
+									MAP_FRAME);
+			flight_subtask_cnt[n]++;
+			flight_global_cnt[n]=0;
+			//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间			
+		} 
+	}
+	else if(flight_subtask_cnt[n]==3)//下降到起飞点140高度，判断是否到达目标高度
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		//判断是否到达目标高度
+		if(flight_global_cnt[n]<100)//持续100*5ms满足
+		{
+			if(ABS(Total_Controller.Height_Position_Control.Err)<=10.0f)	flight_global_cnt[n]++;
+			else flight_global_cnt[n]/=2;
+		}
+		else//持续100*5ms满足，表示到达目标高度
+		{
+			flight_subtask_cnt[n]++;
+			flight_global_cnt[n]=0;
+		}
+	}
+	else if(flight_subtask_cnt[n]<35)//到达A点所在作业点后，遍历所有航点并检测是否打点,不包括起飞降落共三十个点
 	{
 		if(QRFlag==0)
 		{
@@ -3200,14 +3285,13 @@ void warehouse_master(void)
 					float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
 					if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
 					else flight_global_cnt[n]/=2;
-				}
-				else
-				{
 					laser_light1.reset=1;
 					laser_light1.times=50000;//闪速50000次
 					laser_light1.period=200;//200*5ms
 					laser_light1.light_on_percent=1.0f;
-
+				}
+				else
+				{
 					execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
 					target_position.x=base_position.x+Scale_Param_2*warehouse_work_waypoints_table[0][flight_subtask_cnt[n]];
 					target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table[1][flight_subtask_cnt[n]];
@@ -3238,10 +3322,10 @@ void warehouse_master(void)
 		{
 			//basic_auto_flight_support();
 			//Front_AprilTag_Control_Pilot();
-			QRFlag==0;
+			QRFlag=0;
 		}
 	}
-	else if(flight_subtask_cnt[n]==33)
+	else if(flight_subtask_cnt[n]==35)
 	{
 		basic_auto_flight_support();//基本飞行支持软件
 		if(execute_time_ms[n]>0) execute_time_ms[n]--;
@@ -3260,6 +3344,11 @@ void warehouse_master(void)
 				OpticalFlow_Control_Pure(0);
 				Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制	
 			}
+			flight_subtask_cnt[n]++;
 		}	
+	}
+	else 
+	{
+		basic_auto_flight_support();
 	}
 }
