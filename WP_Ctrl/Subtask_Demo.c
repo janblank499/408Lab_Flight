@@ -3106,7 +3106,7 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 #define Scale_Param_2 25.0f
 uint16_t QRFlag=0;
 uint16_t TanFlag=0;
-#define Scale_Param_2 25.0f
+//uint16_t t=1;
 const int16_t warehouse_work_waypoints_table[3][35]={
 {0,1,1,1,1,1,1,1,//A面航点坐标
 5,5,5,5,5,5,5,5,//B面航点坐标
@@ -3116,13 +3116,13 @@ const int16_t warehouse_work_waypoints_table[3][35]={
 {0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
 {150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,0}};//Z轴坐标
 uint16_t warehouse_flag[2][24]={
-{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}//A1~D6
-{0}
-};
+{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24},//A1~D6
+{0}};
 
 void Tan90(void)
 {
 	static uint8_t n=17;
+	flight_global_cnt2[n]=1;
 	if(flight_subtask_cnt[n]==0)
 	{
 		TanFlag=0;
@@ -3207,7 +3207,7 @@ void warehouse_master(void)
 		//记录下初始起点位置，实际项目中可设置为某一基准原点，在自动起飞中指定xy原点
 		//base_position.x=VIO_SINS.Position[_EAST];
 		//base_position.y=VIO_SINS.Position[_NORTH];
-		base_position.z=First_Working_Height;//第一作业高度
+		//base_position.z=NamelessQuad.Position[_UP];
 		
 		x=base_position.x;
 		y=base_position.y;
@@ -3215,15 +3215,10 @@ void warehouse_master(void)
 		target_position.x=x;
 		target_position.y=y;
 		target_position.z=z;
-		Horizontal_Navigation(target_position.x,
-													target_position.y,
-													target_position.z,
-													GLOBAL_MODE,
-													MAP_FRAME);
+		Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
 		flight_subtask_cnt[n]++;
 		flight_global_cnt[n]=0;
-		execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
-
+		//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
 	}
 	else if(flight_subtask_cnt[n]==1)//在起飞点旋转90度
 	{
@@ -3247,11 +3242,7 @@ void warehouse_master(void)
 		if(execute_time_ms[n]==0)
 		{
 			target_position.z=140;
-			Horizontal_Navigation(target_position.x,
-									target_position.y,
-									target_position.z,
-									GLOBAL_MODE,
-									MAP_FRAME);
+			Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
 			flight_subtask_cnt[n]++;
 			flight_global_cnt[n]=0;
 			//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间			
@@ -3268,6 +3259,7 @@ void warehouse_master(void)
 		}
 		else//持续100*5ms满足，表示到达目标高度
 		{
+			execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
 			flight_subtask_cnt[n]++;
 			flight_global_cnt[n]=0;
 		}
@@ -3282,8 +3274,14 @@ void warehouse_master(void)
 			{
 				if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
 				{
+					/*
 					float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
 					if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
+					else flight_global_cnt[n]/=2;
+					*/
+					float dis_cm=pythagorous3(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y,Total_Controller.Height_Position_Control.Err);
+					//距离误差约束20cm，针对基础赛题可以加大此处阈值，从而实现更快速遍历
+					if(dis_cm<=patrol_fixed_3d_20cm)	flight_global_cnt[n]++;
 					else flight_global_cnt[n]/=2;
 					laser_light1.reset=1;
 					laser_light1.times=50000;//闪速50000次
@@ -3292,28 +3290,29 @@ void warehouse_master(void)
 				}
 				else
 				{
-					execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
-					target_position.x=base_position.x+Scale_Param_2*warehouse_work_waypoints_table[0][flight_subtask_cnt[n]];
-					target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table[1][flight_subtask_cnt[n]];
-					target_position.z=base_position.z+warehouse_work_waypoints_table[2][flight_subtask_cnt[n]];
-					Horizontal_Navigation(target_position.x,
-																target_position.y,
-																target_position.z,
-																GLOBAL_MODE,
-																MAP_FRAME);
-					if(flight_subtask_cnt[n]==8||flight_subtask_cnt[n]==16||flight_subtask_cnt[n]==24)
+					if(flight_global_cnt2[n]==9||flight_global_cnt2[n]==17||flight_global_cnt2[n]==25)
 					{
 						Tan180();
+						flight_global_cnt[n]=100;
 					}
-					flight_subtask_cnt[n]++;
-					flight_global_cnt[n]=0;
-					//QRFlag=1;
-					if(1)
+					if(TanFlag==1)
 					{
-						laser_light1.reset=1;
-						laser_light1.times=1;//闪烁50000次
-						laser_light1.period=200;//200*5ms
-						laser_light1.light_on_percent=0.5f;
+						execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
+						target_position.x=base_position.x+Scale_Param_2*warehouse_work_waypoints_table[0][flight_global_cnt2[n]];
+						target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table[1][flight_global_cnt2[n]];
+						target_position.z=warehouse_work_waypoints_table[2][flight_global_cnt2[n]];
+						Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+						flight_subtask_cnt[n]++;
+						flight_global_cnt2[n]++;
+						flight_global_cnt[n]=0;	
+						//QRFlag=1;
+						if(1)
+						{
+							laser_light1.reset=1;
+							laser_light1.times=1;//闪烁50000次
+							laser_light1.period=200;//200*5ms
+							laser_light1.light_on_percent=0.5f;
+						}
 					}
 				}
 			}
@@ -3333,8 +3332,9 @@ void warehouse_master(void)
 		{
 			if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
 			{
-				float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
-				if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
+				float dis_cm=pythagorous3(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y,Total_Controller.Height_Position_Control.Err);
+				//距离误差约束20cm，针对基础赛题可以加大此处阈值，从而实现更快速遍历
+				if(dis_cm<=patrol_fixed_3d_20cm)	flight_global_cnt[n]++;
 				else flight_global_cnt[n]/=2;
 			}
 			else
