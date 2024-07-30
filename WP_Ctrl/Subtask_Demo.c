@@ -3106,6 +3106,7 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 #define Scale_Param_2 25.0f
 uint16_t QRFlag=0;
 uint16_t TanFlag=0;
+uint16_t CntTemp=0;
 //uint16_t t=1;
 const int16_t warehouse_work_waypoints_table[3][35]={
 {0,1,1,1,1,1,1,1,//A面航点坐标
@@ -3122,7 +3123,6 @@ uint16_t warehouse_flag[2][24]={
 void Tan90(void)
 {
 	static uint8_t n=17;
-	flight_global_cnt2[n]=1;
 	if(flight_subtask_cnt[n]==0)
 	{
 		TanFlag=0;
@@ -3150,6 +3150,7 @@ void Tan90(void)
 		OpticalFlow_Control_Pure(0);//SLAM定点控制
 		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,NUL);//高度控制
 		TanFlag=1;
+		flight_subtask_cnt[n]%=2;
 	}
 	else
 	{
@@ -3165,7 +3166,7 @@ void Tan180(void)
 		TanFlag=0;
 		Flight.yaw_ctrl_mode=CLOCKWISE;
 		Flight.yaw_ctrl_start=1;
-		Flight.yaw_outer_control_output  =180;//顺时针90度	
+		Flight.yaw_outer_control_output  =180;//顺时针180度	
 		OpticalFlow_Control_Pure(0);	
 		Flight_Alt_Hold_Control(ALTHOLD_MANUAL_CTRL,NUL,NUL);//高度控制
 		flight_subtask_cnt[n]=1;		
@@ -3187,6 +3188,7 @@ void Tan180(void)
 		OpticalFlow_Control_Pure(0);//SLAM定点控制
 		Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,NUL);//高度控制
 		TanFlag=1;
+		flight_subtask_cnt[n]%=2;
 	}
 	else
 	{
@@ -3294,6 +3296,12 @@ void warehouse_master(void)
 					{
 						Tan180();
 						flight_global_cnt[n]=100;
+						if(TanFlag==1)
+						{
+							execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+							CntTemp=flight_subtask_cnt[n];
+							flight_subtask_cnt[n]=36;
+						}
 					}
 					if(TanFlag==1)
 					{
@@ -3346,6 +3354,14 @@ void warehouse_master(void)
 			}
 			flight_subtask_cnt[n]++;
 		}	
+	}
+	else if(flight_subtask_cnt[n]==36)//延迟五秒
+	{
+			if(execute_time_ms[n]>0) execute_time_ms[n]--;
+			if(execute_time_ms[n]==0) 
+			{
+				flight_subtask_cnt[n]=CntTemp;
+			}
 	}
 	else 
 	{
