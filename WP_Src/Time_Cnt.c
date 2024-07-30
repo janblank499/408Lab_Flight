@@ -194,18 +194,18 @@ void TIMER2A_Handler(void)//地面站数据发送中断函数 10ms
 
 	speaker_notify_run(&speaker_mode);
 
-	static uint16_t _cnt=0;
-	_cnt++;
-	if(_cnt>=20)
-	{
-		//每20*10ms执行一次
-		NCLink_Send_To_Firetruck(VIO_SINS.Position[_EAST],
-														 VIO_SINS.Position[_NORTH],
-													   NamelessQuad.Position[_UP],
-													   WP_Sensor.distance_3d_cm,
-														 fire_x,fire_y,fire_flag);
-		_cnt=0;
-	}
+	// static uint16_t _cnt=0;
+	// _cnt++;
+	// if(_cnt>=20)
+	// {
+	// 	//每20*10ms执行一次
+	// 	NCLink_Send_To_Firetruck(VIO_SINS.Position[_EAST],
+	// 													 VIO_SINS.Position[_NORTH],
+	// 												   NamelessQuad.Position[_UP],
+	// 												   WP_Sensor.distance_3d_cm,
+	// 													 fire_x,fire_y,fire_flag);
+	// 	_cnt=0;
+	// }
 	TimerIntClear(TIMER2_BASE,TIMER_TIMA_TIMEOUT);
 }
 

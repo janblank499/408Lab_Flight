@@ -3107,18 +3107,18 @@ void Air_Ground_Extinguish_Fire_System_Innovation(void)
 uint16_t QRFlag=0;
 uint16_t TanFlag=0;
 uint16_t CntTemp=0;
+uint16_t CntTemp2=0;
 //uint16_t t=1;
 const int16_t warehouse_work_waypoints_table[3][35]={
 {0,1,1,1,1,1,1,1,//A面航点坐标
 5,5,5,5,5,5,5,5,//B面航点坐标
-9,9,9,9,9,9,9,//C面航点坐标
-13,13,13,13,13,13,13,13,//D面航点坐标
+9,9,9,9,9,9,9,9,//C面航点坐标
+13,13,13,13,13,13,13,//D面航点坐标
 14},//x轴坐标
 {0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
 {150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,0}};//Z轴坐标
-uint16_t warehouse_flag[2][24]={
-{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24},//A1~D6
-{0}};
+uint8_t warehouse_QRCode[30]={0};
+//0 A3 A2 A1 A4 A5 A6 B6 B5 B4 B1 B2 B3 C3 C2 C1 C4 C5 C6 D6 D5 D4 D1 D2 D3
 
 void Tan90(void)
 {
@@ -3201,7 +3201,8 @@ void warehouse_master(void)
 {
 	static uint8_t n=16;//子线程计数器序号
 	Vector3f target_position;
-	float x=0,y=0,z=0;	
+	float x=0,y=0,z=0;
+	flight_global_cnt2[n]=1;  
 	if(flight_subtask_cnt[n]==0)//起飞点作为第一个悬停点
 	{
 		basic_auto_flight_support();//基本飞行支持软件
@@ -3310,26 +3311,24 @@ void warehouse_master(void)
 						target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table[1][flight_global_cnt2[n]];
 						target_position.z=warehouse_work_waypoints_table[2][flight_global_cnt2[n]];
 						Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+						//QRFlag=1;
+						if(Opv_Front_View_Target.reserved4_int32)
+						{
+							warehouse_QRCode[flight_global_cnt2[n]-1]=Opv_Front_View_Target.reserved4_int32;//数组的第0位为0，第一位对应A3存储二维码数据。
+							laser_light1.reset=1;
+							laser_light1.times=1;//闪烁1次
+							laser_light1.period=200;//周期200*5ms
+							laser_light1.light_on_percent=0.5f;//占空比50%
+							execute_time_ms[n]=1000/flight_subtask_delta;//子任务执行时间
+							CntTemp2=flight_subtask_cnt[n];
+							flight_subtask_cnt[n]=37;
+						}
 						flight_subtask_cnt[n]++;
 						flight_global_cnt2[n]++;
-						flight_global_cnt[n]=0;	
-						//QRFlag=1;
-						if(1)
-						{
-							laser_light1.reset=1;
-							laser_light1.times=1;//闪烁50000次
-							laser_light1.period=200;//200*5ms
-							laser_light1.light_on_percent=0.5f;
-						}
+						flight_global_cnt[n]=0;
 					}
 				}
 			}
-		}
-		else if(QRFlag==1)
-		{
-			//basic_auto_flight_support();
-			//Front_AprilTag_Control_Pilot();
-			QRFlag=0;
 		}
 	}
 	else if(flight_subtask_cnt[n]==35)
@@ -3355,13 +3354,22 @@ void warehouse_master(void)
 			flight_subtask_cnt[n]++;
 		}	
 	}
-	else if(flight_subtask_cnt[n]==36)//延迟五秒
+	else if(flight_subtask_cnt[n]==36)//Tan180专用延迟五秒
 	{
-			if(execute_time_ms[n]>0) execute_time_ms[n]--;
-			if(execute_time_ms[n]==0) 
-			{
-				flight_subtask_cnt[n]=CntTemp;
-			}
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			flight_subtask_cnt[n]=CntTemp;
+		}
+	}
+	else if(flight_subtask_cnt[n]==37)//传送到地面站，同时作为闪烁的延迟
+	{
+		Speaker_Send(&warehouse_QRCode[flight_global_cnt2[n]-2],sizeof(warehouse_QRCode[flight_global_cnt2[n]-2]));
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			flight_subtask_cnt[n]=CntTemp2;
+		}
 	}
 	else 
 	{
