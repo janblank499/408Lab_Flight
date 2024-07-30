@@ -321,7 +321,11 @@ void QuadShow(uint8_t show_enable)
 													 display_6_8_number(15,7,Temperature_Stable_Flag);  
 													 display_6_8_number(30,7,Gyro_Safety_Calibration_Flag);
 													 display_6_8_number(45,7,WP_Sensor._temperature);         
-													 display_6_8_number(85,7,NamelessQuad.Inertial_Acceleration[_UP]);		
+													 display_6_8_number(85,7,NamelessQuad.Inertial_Acceleration[_UP]);
+				if(_button.state[ME_3D].press==LONG_PRESS)
+				{
+					task_select_cnt++
+				}
 		}
 		break;
 		case 1:

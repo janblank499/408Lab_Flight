@@ -3234,7 +3234,7 @@ void warehouse_master(void)
 			{
 				flight_subtask_cnt[n]++;
 				flight_global_cnt[n]=0;
-				execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+				execute_time_ms[n]=3000/flight_subtask_delta;//子任务执行时间
 			}
 		}
 	}
@@ -3262,7 +3262,7 @@ void warehouse_master(void)
 		}
 		else//持续100*5ms满足，表示到达目标高度
 		{
-			execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
+			execute_time_ms[n]=3000/flight_subtask_delta;//子任务执行时间		
 			flight_subtask_cnt[n]++;
 			flight_global_cnt[n]=0;
 		}
@@ -3364,7 +3364,7 @@ void warehouse_master(void)
 	}
 	else if(flight_subtask_cnt[n]==37)//传送到地面站，同时作为闪烁的延迟
 	{
-		Speaker_Send(&warehouse_QRCode[flight_global_cnt2[n]-2],sizeof(warehouse_QRCode[flight_global_cnt2[n]-2]));
+		Speaker_Send(&warehouse_QRCode[flight_global_cnt2[n]-2],sizeof(warehouse_QRCode[flight_global_cnt2[n]-2]));//使用排针UART4作为地面站传输串口，波特率115200
 		if(execute_time_ms[n]>0) execute_time_ms[n]--;
 		if(execute_time_ms[n]==0) 
 		{
@@ -3375,4 +3375,9 @@ void warehouse_master(void)
 	{
 		basic_auto_flight_support();
 	}
+}
+
+void warehouse_master_plus(void)
+{
+	return;
 }
