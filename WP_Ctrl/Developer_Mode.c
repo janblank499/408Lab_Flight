@@ -52,6 +52,8 @@ int16_t task_select_cnt=1;//任务选择计数器,在完成自动起飞后,会在当前case的基础上
 													//自加或者自减task_select_cnt,从而实现自动起飞后,执行不同的飞行任务
 //特别提示，任务1~9中并没有自动起飞的程序，需要自己手动起飞后，再去切sdk通道执行，
 //也可以在任务10中自动起飞函数执行完毕后,修改SDK1_Mode_Setup的值后再执行1~9
+float QRTemp[30]={0};
+uint8_t QRPlusFlag=0;
 void Auto_Flight_Ctrl(uint8_t *mode)
 {
 	static uint16_t openmv_work_mode=0;
@@ -142,6 +144,7 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 		break;
     case 12://2021年电赛植保无人机赛题
 		{
+			/*
 			if(openmv_work_mode==0)//只配置一次
 			{
 				openmv_work_mode=0x07;
@@ -150,6 +153,8 @@ void Auto_Flight_Ctrl(uint8_t *mode)
 			//2021年电子设计竞赛G题植保无人机
 		  Agriculture_UAV_Closeloop();//基础部分
 			//Agriculture_UAV_Innovation();//发挥部分
+			*/
+			warehouse_master2();
 		}
 		break;
     case 13://ROS上位机控制无人机
@@ -161,7 +166,31 @@ void Auto_Flight_Ctrl(uint8_t *mode)
     case 14: //导航控制控制函数，可以用于无名创新地面站控制
 		{
 			//basic_auto_flight_support();
-			warehouse_master_plus();
+			/*
+			for(QRCnt=1;QRCnt<=24;QRCnt++)
+			{
+				ReadFlashParameterOne(270+QRCnt*8,&QRTemp[QRCnt]);
+				warehouse_QRCode[QRCnt]=(int)QRTemp[QRCnt];
+			}
+			if(Opv_Front_View_Target.reserved4_int32)
+			{
+				warehouse_QRCode[29]=Opv_Front_View_Target.reserved4_int32;
+				if(warehouse_QRCode[QRMatchCnt]==warehouse_QRCode[29])
+				{
+					Speaker_Send(&QRMatchCnt,sizeof(QRMatchCnt));
+					QRPlusFlag=1;
+				}
+				else 
+				{
+					QRMatchCnt++;
+					QRMatchCnt%=29;
+				}
+			}
+			if(QRPlusFlag==1)
+			{
+				warehouse_master_plus();
+			}
+			*/
 		}
 		break;
 		case 15://2022年电赛送货无人机赛题——基础

@@ -3108,6 +3108,7 @@ uint16_t QRFlag=0;
 uint16_t TanFlag=0;
 uint16_t CntTemp=0;
 uint16_t CntTemp2=0;
+uint32_t QRCnt=1;
 //uint16_t t=1;
 const int16_t warehouse_work_waypoints_table[3][35]={
 {0,1,1,1,1,1,1,1,//A面航点坐标
@@ -3115,9 +3116,9 @@ const int16_t warehouse_work_waypoints_table[3][35]={
 9,9,9,9,9,9,9,9,//C面航点坐标
 13,13,13,13,13,13,13,//D面航点坐标
 14},//x轴坐标
-{0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,0,0,3,5,7,7,5,3,10},//y轴坐标	
+{0,3,5,7,7,5,3,-1,-1,3,5,7,7,5,3,-1,-1,3,5,7,7,5,3,-1,-1,3,5,7,7,5,3,10},//y轴坐标	
 {150,140,140,140,100,100,100,100,100,100,100,100,140,140,140,140,140,140,140,140,100,100,100,100,100,100,100,100,140,140,140,0}};//Z轴坐标
-uint8_t warehouse_QRCode[30]={0};
+uint8_t warehouse_QRCode[30]={{0}};
 //0 A3 A2 A1 A4 A5 A6 B6 B5 B4 B1 B2 B3 C3 C2 C1 C4 C5 C6 D6 D5 D4 D1 D2 D3
 
 void Tan90(void)
@@ -3349,9 +3350,16 @@ void warehouse_master(void)
 				Flight.yaw_ctrl_mode=ROTATE;
 				Flight.yaw_outer_control_output=RC_Data.rc_rpyt[RC_YAW];
 				OpticalFlow_Control_Pure(0);
-				Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制	
+				Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制
+				if(QRCnt<=24)
+				{
+					WriteFlashParameter(270+QRCnt*8,(float)(warehouse_QRCode[QRCnt]));
+				}
+				else
+				{
+					basic_auto_flight_support();
+				}
 			}
-			flight_subtask_cnt[n]++;
 		}	
 	}
 	else if(flight_subtask_cnt[n]==36)//Tan180专用延迟五秒
@@ -3364,10 +3372,10 @@ void warehouse_master(void)
 	}
 	else if(flight_subtask_cnt[n]==37)//传送到地面站，同时作为闪烁的延迟
 	{
-		Speaker_Send(&warehouse_QRCode[flight_global_cnt2[n]-2],sizeof(warehouse_QRCode[flight_global_cnt2[n]-2]));//使用排针UART4作为地面站传输串口，波特率115200
 		if(execute_time_ms[n]>0) execute_time_ms[n]--;
 		if(execute_time_ms[n]==0) 
 		{
+			Speaker_Send(&warehouse_QRCode[flight_global_cnt2[n]-2],sizeof(warehouse_QRCode[flight_global_cnt2[n]-2]));//使用排针UART4作为地面站传输串口，波特率115200
 			flight_subtask_cnt[n]=CntTemp2;
 		}
 	}
@@ -3377,7 +3385,261 @@ void warehouse_master(void)
 	}
 }
 
+uint8_t warehouse_QRCode_Front[30]={0};
+uint8_t warehouse_QRCode_Back[30]={0};
+uint8_t warehouse_QRCode2[30]={0};
+uint16_t QRCnt2=1;
+const int16_t warehouse_work_waypoints_table2[3][30]={
+{0,
+-3,-5,-7,-7,-5,-3,
+1,1,
+-3,-5,-7,-7,-5,-3,
+1,1,
+-3,-5,-7,-7,-5,-3,
+-10
+},//x轴坐标
+{0,
+0,0,0,0,0,0,
+0,7,
+7,7,7,7,7,7,
+7,14,
+14,14,14,14,14,14,
+14
+},
+{150,
+140,140,140,100,100,100,
+100,100,
+100,100,100,140,140,140,
+140,140,
+140,140,140,100,100,100,
+100},
+};
+
+uint8_t QRMatchCnt=0;
+/*
 void warehouse_master_plus(void)
 {
-	return;
+	static uint8_t n=30;//子线程计数器序号
+	Vector3f target_position;
+	float x=0,y=0,z=0;
+	flight_global_cnt2[n]=1;  
+	if(flight_subtask_cnt[n]==0)//起飞点作为第一个悬停点
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+			
+		//记录下初始起点位置，实际项目中可设置为某一基准原点，在自动起飞中指定xy原点
+		//base_position.x=VIO_SINS.Position[_EAST];
+		//base_position.y=VIO_SINS.Position[_NORTH];
+		//base_position.z=NamelessQuad.Position[_UP];
+		
+		x=base_position.x;
+		y=base_position.y;
+		z=First_Working_Height;
+		target_position.x=x;
+		target_position.y=y;
+		target_position.z=z;
+		Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+		flight_subtask_cnt[n]++;
+		flight_global_cnt[n]=0;
+		//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+	}
+	else if(flight_subtask_cnt[n]==1)//匹配识别的二维码
+	{
+		if(warehouse_QRCode[QRMatchCnt]==warehouse_QRCode[29])
+		{
+			Speaker_Send(&QRMatchCnt,sizeof(QRMatchCnt));
+		}
+		else 
+		{
+			QRMatchCnt++;
+			QRMatchCnt%=29;
+		}
+	}
 }
+*/
+
+void warehouse_master2(void)
+{
+	static uint8_t n=20;//子线程计数器序号
+	Vector3f target_position;
+	float x=0,y=0,z=0;
+	flight_global_cnt2[n]=1;  
+	if(flight_subtask_cnt[n]==0)//起飞点作为第一个悬停点
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+			
+		//记录下初始起点位置，实际项目中可设置为某一基准原点，在自动起飞中指定xy原点
+		//base_position.x=VIO_SINS.Position[_EAST];
+		//base_position.y=VIO_SINS.Position[_NORTH];
+		//base_position.z=NamelessQuad.Position[_UP];
+		
+		x=base_position.x;
+		y=base_position.y;
+		z=First_Working_Height;
+		target_position.x=x;
+		target_position.y=y;
+		target_position.z=z;
+		Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+		flight_subtask_cnt[n]++;
+		flight_global_cnt[n]=0;
+		//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间
+	}
+	else if(flight_subtask_cnt[n]==1)//指定航点到起飞点140高度
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0)
+		{
+			target_position.z=140;
+			Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+			flight_subtask_cnt[n]++;
+			flight_global_cnt[n]=0;
+			//execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间			
+		} 
+	}
+	else if(flight_subtask_cnt[n]==2)//下降到起飞点140高度，判断是否到达目标高度
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		//判断是否到达目标高度
+		if(flight_global_cnt[n]<100)//持续100*5ms满足
+		{
+			if(ABS(Total_Controller.Height_Position_Control.Err)<=10.0f)	flight_global_cnt[n]++;
+			else flight_global_cnt[n]/=2;
+		}
+		else//持续100*5ms满足，表示到达目标高度
+		{
+			execute_time_ms[n]=3000/flight_subtask_delta;//子任务执行时间		
+			flight_subtask_cnt[n]++;
+			flight_global_cnt[n]=0;
+		}
+	}
+	else if(flight_subtask_cnt[n]<25)//遍历所有航点并检测是否打点,不包括起飞降落共22个点
+	{
+		if(QRFlag==0)
+		{
+			basic_auto_flight_support();//基本飞行支持软件
+			if(execute_time_ms[n]>0) execute_time_ms[n]--;
+			if(execute_time_ms[n]==0) 
+			{
+				if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
+				{
+					/*
+					float dis_cm=pythagorous2(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y);
+					if(dis_cm<=Fixed_CM)	flight_global_cnt[n]++;
+					else flight_global_cnt[n]/=2;
+					*/
+					float dis_cm=pythagorous3(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y,Total_Controller.Height_Position_Control.Err);
+					//距离误差约束20cm，针对基础赛题可以加大此处阈值，从而实现更快速遍历
+					if(dis_cm<=patrol_fixed_3d_20cm)	flight_global_cnt[n]++;
+					else flight_global_cnt[n]/=2;
+					laser_light1.reset=1;
+					laser_light1.times=50000;//闪速50000次
+					laser_light1.period=200;//200*5ms
+					laser_light1.light_on_percent=1.0f;
+				}
+				else
+				{
+					execute_time_ms[n]=5000/flight_subtask_delta;//子任务执行时间		
+					target_position.x=base_position.x+Scale_Param_2*warehouse_work_waypoints_table2[0][flight_global_cnt2[n]];
+					target_position.y=base_position.y+Scale_Param_2*warehouse_work_waypoints_table2[1][flight_global_cnt2[n]];
+					target_position.z=warehouse_work_waypoints_table2[2][flight_global_cnt2[n]];
+					Horizontal_Navigation(target_position.x,target_position.y,target_position.z,GLOBAL_MODE,MAP_FRAME);
+					/*
+					if(Opv_Front_View_Target.reserved4_int32>=1&&Opv_Front_View_Target.reserved4_int32<=24)
+					{
+						warehouse_QRCode_Front[QRCnt2]=Opv_Front_View_Target.reserved4_int32;//数组的第0位为0，第一位对应A3存储二维码数据。
+						laser_light1.reset=1;
+						laser_light1.times=1;//闪烁1次
+						laser_light1.period=200;//周期200*5ms
+						laser_light1.light_on_percent=0.5f;//占空比50%
+						execute_time_ms[n]=1000/flight_subtask_delta;//子任务执行时间
+						CntTemp2=flight_subtask_cnt[n];
+						flight_subtask_cnt[n]=37;
+					}
+					if(Opv_Top_View_Target.reserved4_int32>=1&&Opv_Top_View_Target.reserved4_int32<=24)
+					{
+						warehouse_QRCode_Back[QRCnt2]=Opv_Top_View_Target.reserved4_int32;
+						laser_light1.reset=1;
+						laser_light1.times=1;//闪烁1次
+						laser_light1.period=200;//周期200*5ms
+						laser_light1.light_on_percent=0.5f;//占空比50%
+						execute_time_ms[n]=1000/flight_subtask_delta;//子任务执行时间
+						CntTemp2=flight_subtask_cnt[n];
+						flight_subtask_cnt[n]=37;
+					}
+					*/
+					flight_subtask_cnt[n]++;
+					flight_global_cnt2[n]++;
+					flight_global_cnt[n]=0;
+				}
+				
+			}
+		}
+	}
+	else if(flight_subtask_cnt[n]==25)
+	{
+		basic_auto_flight_support();//基本飞行支持软件
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			if(flight_global_cnt[n]<Times_Fixed)//持续10*5ms=0.05s满足
+			{
+				float dis_cm=pythagorous3(OpticalFlow_Pos_Ctrl_Err.x,OpticalFlow_Pos_Ctrl_Err.y,Total_Controller.Height_Position_Control.Err);
+				//距离误差约束20cm，针对基础赛题可以加大此处阈值，从而实现更快速遍历
+				if(dis_cm<=patrol_fixed_3d_20cm)	flight_global_cnt[n]++;
+				else flight_global_cnt[n]/=2;
+			}
+			else
+			{
+				Flight.yaw_ctrl_mode=ROTATE;
+				Flight.yaw_outer_control_output=RC_Data.rc_rpyt[RC_YAW];
+				OpticalFlow_Control_Pure(0);
+				Flight_Alt_Hold_Control(ALTHOLD_AUTO_VEL_CTRL,NUL,-30);//高度控制
+				if(QRCnt<=24)
+				{
+					WriteFlashParameter(270+QRCnt*8,(float)(warehouse_QRCode[QRCnt]));
+					QRCnt++;
+				}
+				else
+				{
+					basic_auto_flight_support();
+				}
+			}
+		}	
+	}
+	else if(flight_subtask_cnt[n]==37)//传送到地面站，同时作为闪烁的延迟
+	{
+		//basic_auto_flight_support();
+		if(execute_time_ms[n]>0) execute_time_ms[n]--;
+		if(execute_time_ms[n]==0) 
+		{
+			if(warehouse_QRCode[6]==0)
+			{
+				warehouse_QRCode[QRCnt2]=warehouse_QRCode_Front[QRCnt2];
+				Speaker_Send(&warehouse_QRCode_Front[QRCnt2],sizeof(warehouse_QRCode_Front[QRCnt2]));//使用排针UART4作为地面站传输串口，波特率115200
+				QRCnt2++;
+			}
+			else if(warehouse_QRCode[12]==0)//B1-C6，先发出B再发出C
+			{
+				warehouse_QRCode[QRCnt2]=warehouse_QRCode_Back[QRCnt2];
+				Speaker_Send(&warehouse_QRCode_Back[QRCnt2],sizeof(warehouse_QRCode_Back[QRCnt2]));//使用排针UART4作为地面站传输串口，波特率115200
+				warehouse_QRCode[QRCnt2+6]=warehouse_QRCode_Front[QRCnt2];
+				Speaker_Send(&warehouse_QRCode_Front[QRCnt2],sizeof(warehouse_QRCode_Front[QRCnt2]));//使用排针UART4作为地面站传输串口，波特率115200
+				QRCnt2++;
+			}
+			else if(warehouse_QRCode[24]==0)
+			{
+				warehouse_QRCode[QRCnt2+6]=warehouse_QRCode_Back[QRCnt2];
+				Speaker_Send(&warehouse_QRCode_Back[QRCnt2],sizeof(warehouse_QRCode_Back[QRCnt2]));//使用排针UART4作为地面站传输串口，波特率115200
+				QRCnt2++;
+			}
+			flight_subtask_cnt[n]=CntTemp2;
+			execute_time_ms[n]=3000/flight_subtask_delta;//子任务执行时间
+		}
+	}
+	else 
+	{
+		basic_auto_flight_support();
+	}
+}
+

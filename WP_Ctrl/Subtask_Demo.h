@@ -37,6 +37,7 @@ void substask_params_init(void);
 
 void warehouse_master(void);
 void warehouse_master_plus(void);
+void warehouse_master2(void);
 
 extern uint16_t flight_subtask_cnt[FLIGHT_SUBTASK_NUM];
 extern uint32_t execute_time_ms[FLIGHT_SUBTASK_NUM];
@@ -61,7 +62,13 @@ extern uint8_t fire_flag;//火源标志
 
 extern uint16_t release_pwm_us;//释放灭火包舵机pwm
 extern uint16_t pinch_pwm_us;//夹住灭火包舵机pwm,需要在初始化的时候就给舵机赋此pwm值
-
+extern uint32_t QRCnt;
+extern uint8_t warehouse_QRCode[30];
+//extern uint8_t warehouse_QRCode_Front[30];
+//extern uint8_t warehouse_QRCode_Back[30];
+extern uint8_t warehouse_QRCode2[30];
+extern uint16_t QRCnt2;
+extern uint8_t QRMatchCnt;
 
 #endif
 

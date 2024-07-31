@@ -9,6 +9,8 @@ extern uint8_t SDK1_Mode_Setup,Forward_Vision_Mode_Setup;
 extern int16_t task_select_cnt;
 	
 void Auto_Flight_Ctrl(uint8_t *mode);
+extern float QRTemp[30];
+extern uint8_t QRPlusFlag;
 #endif
 
 
